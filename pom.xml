@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.hpe.releng</groupId>
+    <artifactId>os-test</artifactId>
+    <version>1.16.0-SNAPSHOT</version>
+    <name>ftp</name>
+    <packaging>pom</packaging>
+	
+	<!--TEST134-->
+    <properties>
+
+        <branch>1.3.0</branch>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
+
+        <maven.compiler.version>3.3</maven.compiler.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+	<copyrightYear>2020</copyrightYear>
+
+        <docker.dev.repo>${corporateDockerRegistry}</docker.dev.repo>
+        <corporateDockerRegistry>rh7-artifactory.svs.hpeswlab.net:8443</corporateDockerRegistry>
+        <corporateDockerSnapshotRegistry>rh7-artifactory.svs.hpeswlab.net:8443</corporateDockerSnapshotRegistry>
+        <corporateDockerReleaseRegistry>rh7-artifactory.svs.hpeswlab.net:8444</corporateDockerReleaseRegistry>
+        <corporate.repository.manager.url>http://rh7-artifactory.svs.hpeswlab.net:8081/artifactory</corporate.repository.manager.url>
+        <skipLicenseHeadersCheck>true</skipLicenseHeadersCheck>
+        <skipLocalStaging>true</skipLocalStaging>
+        <enforceCodeStyle>false</enforceCodeStyle>
+		
+		<dockerImagePrefix>rh7-artifactory.svs.hpeswlab.net:8443/</dockerImagePrefix>
+        <dockerOrgSeperator>/</dockerOrgSeperator>
+        <dockerVersionSeperator>:</dockerVersionSeperator>
+		<corporateMavenSnapshotRepositoryUrl>http://rh7-artifactory.svs.hpeswlab.net:8081/artifactory/libs-snapshot-local</corporateMavenSnapshotRepositoryUrl>
+        <corporateMavenReleaseRepositoryUrl>http://rh7-artifactory.svs.hpeswlab.net:8081/artifactory/libs-release-local</corporateMavenReleaseRepositoryUrl>
+    </properties>
+<!--
+    <dependencies>
+        <dependency>
+	    <groupId>com.hpe.aspen</groupId>
+	    <artifactId>acceptance-tests</artifactId>
+	    <version>2.6.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>	
+-->
+<!-- Distribute to the corporate repository manager -->
+    <distributionManagement>
+        <repository>
+            <id>corporate-maven-releases</id>
+            <name>Internal Company Releases</name>
+            <url>${corporateMavenReleaseRepositoryUrl}</url>
+        </repository>
+        <snapshotRepository>
+            <id>corporate-maven-snapshots</id>
+            <name>Internal Company Snapshots</name>
+            <url>${corporateMavenSnapshotRepositoryUrl}</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <plugins>
+            <!-- Use Java 8 for both source code and target VM -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <!-- Get the git buildnumbers -->
+            <plugin>
+                <groupId>ru.concerteza.buildnumber</groupId>
+                <artifactId>maven-jgit-buildnumber-plugin</artifactId>
+                <version>1.2.10</version>
+                <executions>
+                    <execution>
+                        <id>git-buildnumber</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>extract-buildnumber</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Set the git.branch property to 'unknown' if it could not be retrieved -->
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>set-git-branch-if-unknown</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <scripts>
+                                <script><![CDATA[
+                                    if (project.properties['git.branch'].allWhitespace) {
+                                        project.properties.setProperty('git.branch', 'unknown');
+                                    }
+                                ]]></script>
+                            </scripts>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.groovy</groupId>
+                        <artifactId>groovy-all</artifactId>
+                        <version>2.4.7</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!-- Add the project and version information to the JAR Manifest -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${project.groupId}.${project.artifactId}</Implementation-Title>
+                            <Implementation-Version>${git.revision}</Implementation-Version>
+                            <Specification-Version>${project.version}</Specification-Version>
+                            <X-Git-Branch>${git.branch}</X-Git-Branch>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+	    
+        </plugins>
+    </build>
+	
+    <profiles>
+        <profile>
+            <id>build-container</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>${project.basedir}/src/main/docker</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jolokia</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.13.3</version>
+                        <executions>
+                            <execution>
+                                <id>docker-build</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                            <execution>
+                                <id>docker-push</id>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                                <phase>deploy</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <autoPull>true</autoPull>
+                            <useColor>false</useColor>
+                            <verbose>true</verbose>						
+                            <images>
+                                <image>
+									                <name>${corporateDockerRegistry}/releng/osTest:${project.version}</name>
+                                    <build>
+                                        <maintainer>tony.mcveigh@hpe.com</maintainer>
+										<from>cafinternal/keyview:2.1</from>
+                                        <labels>
+											<test.version>${project.version}</test.version>
+											<Build.Number>${project.version}</Build.Number>
+                                            <Build.Date>${maven.build.timestamp}</Build.Date>
+                                        </labels>
+                                    </build>
+                                </image>
+                                <image>
+									                <name>${corporateDockerRegistry}/releng/baseOsTest:${project.version}</name>
+                                    <build>
+                                        <maintainer>tony.mcveigh@hpe.com</maintainer>
+											<from>cafinternal/prereleases:opensuse-jre8-3.1.0-SNAPSHOT</from>
+                                        <labels>
+											<test.version>${project.version}</test.version>
+											<Build.Number>${project.version}</Build.Number>
+                                            <Build.Date>${maven.build.timestamp}</Build.Date>
+                                        </labels>
+                                    </build>
+                                </image>								
+                            </images>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>	
+
+</project>
