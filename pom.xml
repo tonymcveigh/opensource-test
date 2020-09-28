@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.hpe.releng</groupId>
     <artifactId>os-test</artifactId>
-    <version>1.19.0-9</version>
+    <version>1.20.0-SNAPSHOT</version>
     <name>ftp</name>
     <packaging>pom</packaging>
 	
