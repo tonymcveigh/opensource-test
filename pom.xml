@@ -195,7 +195,7 @@
 									                <name>${corporateDockerRegistry}/releng/baseostest:${project.version}</name>
                                     <build>
                                         <maintainer>tony.mcveigh@hpe.com</maintainer>
-											<from>cafinternal/prereleases:opensuse-jre8-3.0.0-184</from>
+											<from>cafinternal/keyview:2.1</from>
                                         <labels>
 											<test.version>${project.version}</test.version>
 											<Build.Number>${project.version}</Build.Number>
