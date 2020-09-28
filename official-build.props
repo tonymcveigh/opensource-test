@@ -6,4 +6,5 @@ USE_OPEN_SOURCE_SETTINGS=false
 SEPG_BUILD_ENV_IMAGE=saas-docker.svsartifactory.swinfra.net/sepg/maven-jdk8-sepg:1.3.0-93
 GENERIC_1_ARTIFACTS=**/*.cab
 GENERIC_1_EXPECTED_ARTIFACT_COUNT=1
-GENERIC_1_TARGET_URL=${genericRepoMgr}/saas-controlpoint-local/relTest/CabFiles/${version}-${build-number}/${filename}
+GENERIC_1_TARGET_URL=${genericRepoMgr}/saas-controlpoint-local/relTest/rel/CabFiles/${version}-${build-number}/${filename}
+GENERIC_1_CI_TARGET_URL=${genericRepoMgr}/saas-controlpoint-local/CITest/CabFiles/${version}-${build-number}/${filename}
