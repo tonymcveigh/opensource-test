@@ -1,0 +1,7 @@
+**/.idea/
+**/dependency-reduced-pom.xml
+**/*.bak
+**/*.iml
+**/target/
+**/bower_components/
+**/*.iml
