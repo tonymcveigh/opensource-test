@@ -1,10 +1,10 @@
 #====IGNORE THESE, JUST FOR THE PURPOSES OF DEMO ====
-RETAG_CORPORATE_DOCKER_HUB_IMAGES=TRUE
+#RETAG_CORPORATE_DOCKER_HUB_IMAGES=TRUE
 USE_OPEN_SOURCE_SETTINGS=false
 #=====================================================
-
+MAVEN_PHASE=install
 SEPG_BUILD_ENV_IMAGE=saas-docker.svsartifactory.swinfra.net/sepg/maven-jdk8-sepg:1.3.0-93
-GENERIC_1_ARTIFACTS=**/*.cab
-GENERIC_1_EXPECTED_ARTIFACT_COUNT=1
-GENERIC_1_TARGET_URL=${genericRepoMgr}/saas-controlpoint-local/relTest/rel/CabFiles/${version}-${build-number}/${filename}
-GENERIC_1_CI_TARGET_URL=${genericRepoMgr}/saas-controlpoint-local/CITest/CabFiles/${version}-${build-number}/${filename}
+#GENERIC_1_ARTIFACTS=**/*.cab
+#GENERIC_1_EXPECTED_ARTIFACT_COUNT=1
+#GENERIC_1_TARGET_URL=${genericRepoMgr}/saas-controlpoint-local/relTest/rel/CabFiles/${version}-${build-number}/${filename}
+#GENERIC_1_CI_TARGET_URL=${genericRepoMgr}/saas-controlpoint-local/CITest/CabFiles/${version}-${build-number}/${filename}
